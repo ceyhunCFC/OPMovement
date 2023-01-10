@@ -1,0 +1,83 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class Movement : MonoBehaviour
+{
+    public float Move_Speed = 5, Turn_Speed = 10, Jump_Speed = 5, health = 100;
+    Rigidbody rb;
+    public GameObject CameraHolder,Camera,Gun1,Gun2;
+
+
+    void Start()
+    {
+       Cursor.lockState = CursorLockMode.Locked;
+       rb = GetComponent<Rigidbody>();      
+    }
+
+
+    void Update()
+    {  
+        MovementControl();
+        ChangeGun();  
+
+        if (Input.GetKeyDown(KeyCode.Mouse0))
+        Shoot();
+       
+    }
+
+    void MovementControl()
+    {
+        transform.position += transform.forward * Input.GetAxis("Vertical") * Move_Speed * Time.deltaTime;
+        transform.position += transform.right * Input.GetAxis("Horizontal") * Move_Speed * Time.deltaTime;
+
+      
+        transform.Rotate(0, 10f * Input.GetAxis("Mouse X") * 10 * Turn_Speed * Time.deltaTime, 0, Space.Self);     
+        CameraHolder.transform.Rotate(10f * -Input.GetAxis("Mouse Y") * 10 *  Turn_Speed * Time.deltaTime, 0, 0, Space.Self);  
+        
+        
+        if (Input.GetKeyDown(KeyCode.Space))
+        rb.AddForce(transform.up * 300); 
+
+    }
+
+
+    void Shoot()
+    {     
+
+        if (Physics.Raycast(Camera.transform.position, Camera.transform.TransformDirection(Vector3.forward), Mathf.Infinity, 1))
+        {
+            Debug.DrawRay(Camera.transform.position, Camera.transform.TransformDirection(Vector3.forward) * 1000, Color.green,500f);
+            DamageSystem();
+        }
+
+
+          
+    }
+
+    void ChangeGun()
+    {
+        
+        if (Input.GetAxisRaw("Mouse ScrollWheel")>0)
+        {
+            Gun2.SetActive(false);
+            Gun1.SetActive(true);
+        }
+        else if (Input.GetAxisRaw("Mouse ScrollWheel")<0)
+        {                      
+            Gun1.SetActive(false);
+            Gun2.SetActive(true);
+        }
+
+    }
+
+    void DamageSystem()
+    {
+        Physics.Raycast(Camera.transform.position, Camera.transform.TransformDirection(Vector3.forward),out RaycastHit hitInfo, Mathf.Infinity, 1);
+
+        print(hitInfo.collider.gameObject.name);
+       
+    }
+
+
+}
